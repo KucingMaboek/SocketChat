@@ -12,7 +12,7 @@ import javafx.scene.control.TextField;
 import utils.ConnectionUtil;
 import utils.TaskReadThread;
 
-import java.io.DataOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
@@ -40,7 +40,7 @@ public class ClientController implements Initializable {
     public ListView<String> lv_conversation;
 
     private String username;
-    private DataOutputStream output = null;
+    private ObjectOutputStream output = null;
 
     @FXML
     void connectServer(ActionEvent event) {
@@ -56,7 +56,7 @@ public class ClientController implements Initializable {
             tf_server.setEditable(false);
 
             // Create an output stream to send data to the server
-            output = new DataOutputStream(socket.getOutputStream());
+            output = new ObjectOutputStream(socket.getOutputStream());
 
             //create a thread in order to read message from server continuously
             TaskReadThread task = new TaskReadThread(socket, this);
@@ -64,7 +64,8 @@ public class ClientController implements Initializable {
             thread.start();
 
             try {
-                output.writeUTF(username + " is joined!!");
+                output.writeObject(username + " is joined!!");
+                output.writeObject(username + " is joined!!");
                 output.flush();
             } catch (IOException e) {
                 System.err.println(e.getMessage());
@@ -81,7 +82,7 @@ public class ClientController implements Initializable {
         String message = tf_message.getText();
         try {
             //send message to server
-            output.writeUTF(username + ": " + message);
+            output.writeObject(username + ": " + message);
             output.flush();
 
             //clear the textfield

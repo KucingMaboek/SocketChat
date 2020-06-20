@@ -1,6 +1,6 @@
 package utils;
 
-import java.io.DataInputStream;
+import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -11,6 +11,7 @@ public class TaskReadThread implements Runnable {
     //private variables
     private Socket socket;
     private ClientController client;
+    private ObjectInputStream input;
 
     //constructor
     public TaskReadThread(Socket socket, ClientController client) {
@@ -18,25 +19,35 @@ public class TaskReadThread implements Runnable {
         this.client = client;
     }
 
-    @Override 
+    @Override
     public void run() {
         //continuously loop it
+        try {
+            //Create data input stream
+            input = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            System.out.println("Error reading from server: " + e.getMessage());
+            e.printStackTrace();
+        }
         while (true) {
             try {
-                //Create data input stream
-                DataInputStream input = new DataInputStream(socket.getInputStream());
-
                 //get input from the client
-                String message = input.readUTF();
+                String message = null;
+                try {
+                    message = (String) input.readObject();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
 
                 //append message of the Text Area of UI (GUI Thread)
+                String finalMessage = message;
                 Platform.runLater(() -> {
                     //display the message in the textarea
-                    client.lv_conversation.getItems().add(message + "\n");
+                    client.lv_conversation.getItems().add(finalMessage + "\n");
                 });
-            } catch (IOException ex) {
-                System.out.println("Error reading from server: " + ex.getMessage());
-                ex.printStackTrace();
+            } catch (IOException e) {
+                System.out.println("Error reading from server: " + e.getMessage());
+                e.printStackTrace();
                 break;
             }
         }
