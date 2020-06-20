@@ -1,23 +1,20 @@
 package utils;
 
-import com.sun.imageio.plugins.common.I18N;
 import controllers.ServerController;
 import javafx.application.Platform;
-import sun.net.ConnectionResetException;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class TaskClientConnection implements Runnable {
 
-    Socket socket;
-    ServerController server;
+    private Socket socket;
+    private ServerController server;
     // Create data input and output streams
-    DataInputStream input;
-    DataOutputStream output;
+    private DataInputStream input;
+    private DataOutputStream output;
 
     public TaskClientConnection(Socket socket, ServerController server) {
         this.socket = socket;
@@ -42,9 +39,7 @@ public class TaskClientConnection implements Runnable {
                 server.broadcast(message);
 
                 //append message of the Text Area of UI (GUI Thread)
-                Platform.runLater(() -> {
-                    server.lv_conversation.getItems().add(message + "\n");
-                });
+                Platform.runLater(() -> server.lv_conversation.getItems().add(message + "\n"));
             }
 
 
