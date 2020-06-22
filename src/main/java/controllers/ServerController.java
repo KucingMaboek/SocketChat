@@ -22,30 +22,30 @@ public class ServerController implements Initializable {
     public ListView<String> lv_conversation;
 
     @FXML
-    private ListView<String> lv_client;
+    public ListView<String> lv_client;
 
 
-    private List<TaskClientConnection> connectionList = new ArrayList<TaskClientConnection>();
+    private List<TaskClientConnection> connectionList = new ArrayList<>();
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         new Thread(() -> {
             try {
-                // Create a server socket
+                // Membuat ServerSocket
                 ServerSocket serverSocket = new ServerSocket(ConnectionUtil.port);
 
                 //append message of the Text Area of UI (GUI Thread)
                 Platform.runLater(()
                         -> lv_conversation.getItems().add("New server started at " + new Date() + '\n'));
 
-                //continous loop
+                // looping
                 while (true) {
-                    // Listen for a connection request, add new connection to the list
+                    // Mengecek permintaan koneksi, dan menambah ke daftar koneksi
                     Socket socket = serverSocket.accept();
                     TaskClientConnection connection = new TaskClientConnection(socket, this);
                     connectionList.add(connection);
-                    lv_client.getItems().add(String.valueOf(connection));
 
-                    //create a new thread
+                    //Membuat thread baru
                     Thread thread = new Thread(connection);
                     thread.start();
 
@@ -56,10 +56,17 @@ public class ServerController implements Initializable {
         }).start();
     }
 
-    //send message to all client
+    // mengirim pesan ke seluruh klien yang ada dalam list
     public void broadcast(String message) {
         for (TaskClientConnection clientConnection : this.connectionList) {
             clientConnection.sendMessage(message);
         }
+    }
+
+    public void addNewClient(String username) {
+        String messages = username + " is joined!!";
+        broadcast(messages);
+        lv_conversation.getItems().add(messages);
+        lv_client.getItems().add(username);
     }
 }

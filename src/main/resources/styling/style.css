@@ -1,0 +1,37 @@
+#anchor_pane_dark{
+    -fx-background-color: #15151B;
+    -fx-text-fill: white
+}
+
+#anchor_pane_dark2{
+    -fx-background-color: #7F4BF6;
+}
+
+#list_view_dark{
+    -fx-background-color: #202029;
+    -fx-text-fill: white
+}
+
+#text_field_dark{
+    -fx-background-radius: 0;
+    -fx-background-color: #202029;
+    -fx-text-fill: white;
+}
+
+#button_dark{
+    -fx-background-radius: 0;
+    -fx-background-color: #5458E1;
+    -fx-text-fill: white;
+}
+
+.list-cell:even{
+    -fx-background-color: #202029;
+    -fx-text-fill: white;
+    -fx-font-family: Arial;
+}
+
+.list-cell:odd{
+    -fx-background-color: #222229;
+    -fx-text-fill: white;
+    -fx-font-family: Arial;
+}

@@ -3,15 +3,17 @@ package utils;
 import controllers.ServerController;
 import javafx.application.Platform;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.IOException;
 import java.net.Socket;
 
 public class TaskClientConnection implements Runnable {
 
     private Socket socket;
     private ServerController server;
+    private ObjectInputStream input;
     private ObjectOutputStream output;
 
     public TaskClientConnection(Socket socket, ServerController server) {
@@ -23,22 +25,28 @@ public class TaskClientConnection implements Runnable {
     public void run() {
 
         try {
-            // Create data input and output streams
-            ObjectInputStream input = new ObjectInputStream(
-                    socket.getInputStream());
+            // membuat object stream input dan output
             output = new ObjectOutputStream(
                     socket.getOutputStream());
+            input = new ObjectInputStream(new BufferedInputStream(
+                    socket.getInputStream()));
+
+            try {
+                server.addNewClient((String) input.readObject());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
 
             while (true) {
-                // Get message from the client
+                // menerima pesan dari klien
                 String message = null;
                 try {
                     message = (String) input.readObject();
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    System.err.println(e.getMessage());
                 }
 
-                //send message via server broadcast
+                // mengirim pesan  broadcast melalui server
                 server.broadcast(message);
 
                 //append message of the Text Area of UI (GUI Thread)
@@ -47,13 +55,13 @@ public class TaskClientConnection implements Runnable {
             }
 
 
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         } finally {
             try {
                 socket.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
             }
 
         }
@@ -66,8 +74,8 @@ public class TaskClientConnection implements Runnable {
             output.writeObject(message);
             output.flush();
 
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
 
     }

@@ -21,33 +21,33 @@ public class TaskReadThread implements Runnable {
 
     @Override
     public void run() {
-        //continuously loop it
+        // Melakukan looping terus menerus
         try {
-            //Create data input stream
+            // Membuat input stream
             input = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
             System.out.println("Error reading from server: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
         while (true) {
             try {
-                //get input from the client
+                // Mendapatkan inputan dari user
                 String message = null;
                 try {
                     message = (String) input.readObject();
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    System.err.println(e.getMessage());
                 }
 
-                //append message of the Text Area of UI (GUI Thread)
+                // Menampilkan pesan dari klien ke UI
                 String finalMessage = message;
                 Platform.runLater(() -> {
-                    //display the message in the textarea
+                    // Pesan akan ditampilkan di list view
                     client.lv_conversation.getItems().add(finalMessage + "\n");
                 });
             } catch (IOException e) {
                 System.out.println("Error reading from server: " + e.getMessage());
-                e.printStackTrace();
+                System.err.println(e.getMessage());
                 break;
             }
         }
